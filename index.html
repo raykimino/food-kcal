@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>食物热量记录</title>
+    
+    <!-- PWA 配置 (支持添加到手机主屏幕) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f4f7f8" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="热量记录">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Chart.js 统计图表库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <!-- Lucide 现代线条图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti 撒花特效库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        if (window.Chart) window.Chart.defaults.devicePixelRatio = 1;
+    </script>
+
+    <style>
+        /* 默认：浅色模式变量 */
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg-color: #f4f7f8; 
+            --card-bg: #ffffff;
+            --text-main: #2c3e50; 
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --danger: #ff4757;
+            --success: #2ed573;
+            --warning: #ffa502;
+            --input-bg: #fafbfc;
+            --item-bg: #f8fafc;
+            --item-hover: #f1f5f9;
+            --btn-header-bg: #f0f4f8;
+            --btn-header-hover: #e2e8f0;
+        }
+
+        /* 自动检测系统深色模式 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #818cf8;
+                --secondary: #a78bfa;
+                --bg-color: #0f172a;
+                --card-bg: #1e293b;
+                --text-main: #f8fafc;
+                --text-light: #94a3b8;
+                --border-color: #334155;
+                --input-bg: #0f172a;
+                --item-bg: #0f172a;
+                --item-hover: #334155;
+                --btn-header-bg: #334155;
+                --btn-header-hover: #475569;
+            }
+            .card {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                border: 1px solid rgba(255,255,255,0.05);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center; color: var(--text-main); margin-bottom: 30px;
+            font-size: 2.2em; font-weight: 800; letter-spacing: 2px;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        h1 .lucide { width: 32px; height: 32px; color: var(--primary); stroke-width: 2.5px; }
+
+        /* 布局网格 */
+        .app-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
+
+        /* 卡片 */
+        .card {
+            background: var(--card-bg); border-radius: 16px; padding: 20px;
+            margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.04); transition: background-color 0.3s, border-color 0.3s;
+        }
+        .card h2 {
+            font-size: 1.2em; margin-bottom: 15px; color: var(--text-main);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card h2 .lucide { width: 22px; height: 22px; color: var(--primary); }
+
+        /* 表单样式 */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-light); font-size: 0.9em; font-weight: 600; }
+        input, select {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 1em; background: var(--input-bg);
+            transition: all 0.3s; color: var(--text-main); color-scheme: dark light;
+        }
+        input:focus, select:focus {
+            outline: none; border-color: var(--primary); background: var(--card-bg);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white; border: none; padding: 12px 20px; border-radius: 8px;
+            font-size: 1em; font-weight: 600; cursor: pointer; width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
+        button .lucide { width: 18px; height: 18px; }
+
+        .btn-small { padding: 6px 12px; font-size: 0.85em; width: auto; border-radius: 6px; }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3); }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { box-shadow: 0 2px 8px rgba(46, 213, 115, 0.3); }
+        
+        .btn-outline { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-outline:hover { background: var(--btn-header-hover); box-shadow: none; }
+
+        /* 日历样式 */
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; }
+        .calendar-header button { width: auto; padding: 5px 10px; background: var(--btn-header-bg); color: var(--text-main); box-shadow: none; }
+        .calendar-header button:hover { background: var(--btn-header-hover); transform: none; box-shadow: none; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .calendar-day-header { font-size: 0.8em; color: var(--text-light); font-weight: bold; padding-bottom: 5px; }
+        .calendar-day {
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; border-radius: 8px; cursor: pointer; font-size: 0.9em;
+            position: relative; transition: background 0.2s; color: var(--text-main);
+        }
+        .calendar-day:hover:not(.empty) { background: var(--item-hover); }
+        .calendar-day.empty { cursor: default; }
+        .calendar-day.empty:hover { background: transparent; }
+        .calendar-day.today { font-weight: bold; color: var(--primary); }
+        .calendar-day.selected { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4); }
+        .calendar-day.selected.today { color: white; }
+        .has-data-dot { width: 4px; height: 4px; background: var(--success); border-radius: 50%; position: absolute; bottom: 4px; }
+        .calendar-day.selected .has-data-dot { background: white; }
+
+        /* 摘要面板 & 进度条 */
+        .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .summary-item {
+            background: var(--item-bg); padding: 15px; border-radius: 12px;
+            text-align: center; border: 1px solid var(--border-color);
+        }
+        .summary-item .value { font-size: 1.8em; font-weight: bold; color: var(--primary); }
+        .summary-item .label { font-size: 0.85em; color: var(--text-light); margin-top: 5px; }
+        
+        .progress-wrapper { padding: 0 5px; }
+        .goal-header { display: flex; justify-content: space-between; font-size: 0.85em; color: var(--text-light); margin-bottom: 6px; }
+        .goal-edit-btn { background: none; border: none; padding: 0; color: var(--primary); width: auto; font-size: 1em; box-shadow: none; cursor: pointer; }
+        .goal-edit-btn:hover { background: none; transform: none; box-shadow: none; text-decoration: underline; }
+        .progress-bg { background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.5s ease-out, background-color 0.3s; }
+        .progress-fill.warning { background: var(--warning); }
+        .progress-fill.danger { background: var(--danger); }
+
+        /* 食物分类列表 */
+        .meal-section { margin-bottom: 20px; }
+        .meal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 2px solid var(--btn-header-bg); margin-bottom: 10px;
+        }
+        .meal-title { font-weight: bold; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .meal-title .lucide { width: 18px; height: 18px; color: var(--primary); }
+        .meal-subtotal { font-size: 0.9em; color: var(--text-light); font-weight: 500;}
+        .food-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: var(--item-bg); border-radius: 8px;
+            margin-bottom: 8px; transition: background 0.2s, border-color 0.2s; border: 1px solid transparent; gap: 10px;
+        }
+        .food-item:hover { background: var(--item-hover); border-color: var(--border-color); }
+        .food-info { flex-grow: 1; min-width: 0; }
+        .food-name { font-weight: 500; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .food-cal { color: var(--text-light); font-size: 0.9em; margin-top: 2px; }
+        .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .empty-message { text-align: center; color: var(--text-light); padding: 20px; font-size: 0.9em; }
+
+        .chart-container { position: relative; height: 250px; width: 100%; }
+
+        @media (max-width: 768px) {
+            .app-layout { grid-template-columns: 1fr; gap: 15px; }
+            body { padding: 10px; }
+            h1 { font-size: 1.8em; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i data-lucide="apple"></i> 食物热量记录</h1>
+
+        <div class="app-layout">
+            <!-- 左侧：日历与添加 -->
+            <div class="left-col">
+                <!-- 日历卡片 -->
+                <div class="card">
+                    <h2><i data-lucide="calendar-days"></i> 饮食日历</h2>
+                    <div class="calendar-header">
+                        <button id="prevMonth" class="btn-small"><i data-lucide="chevron-left"></i></button>
+                        <span id="monthYearDisplay"></span>
+                        <button id="nextMonth" class="btn-small"><i data-lucide="chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                </div>
+
+                <!-- 添加食物表单 -->
+                <div class="card" id="formCard">
+                    <h2><i data-lucide="pen-line"></i> <span id="formTitle">添加记录</span></h2>
+                    <form id="foodForm">
+                        <div class="form-group">
+                            <label for="date">日期</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meal">餐段</label>
+                            <select id="meal">
+                                <option value="breakfast">早餐</option>
+                                <option value="lunch" selected>午餐</option>
+                                <option value="dinner">晚餐</option>
+                                <option value="snack">加餐 / 零食</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">食物名称 (支持历史记忆)</label>
+                            <input type="text" id="name" list="foodSuggestions" placeholder="例如：米饭、苹果..." required autocomplete="off">
+                            <datalist id="foodSuggestions"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label for="calories">热量 (千卡)</label>
+                            <input type="number" id="calories" min="0" step="0.1" placeholder="例如：250" required>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" id="submitBtn" style="flex: 2;">
+                                <i data-lucide="plus" id="submitIcon"></i> <span id="submitBtnText">添加记录</span>
+                            </button>
+                            <button type="button" id="cancelEditBtn" class="btn-outline" style="display: none; flex: 1;" onclick="cancelEdit()">
+                                <i data-lucide="x"></i> 取消
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 右侧：详情与统计 -->
+            <div class="right-col">
+                <!-- 选中日期的总结 -->
+                <div class="card">
+                    <h2 style="justify-content: space-between;">
+                        <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="pie-chart"></i> <span id="selectedDateTitle">今日摄入</span></span>
+                        <!-- 新增：完成打卡按钮 -->
+                        <button class="goal-edit-btn" onclick="finishToday()" style="color: var(--success); display: flex; align-items: center; gap: 4px;">
+                            <i data-lucide="check-circle" style="width:18px;height:18px;"></i> 完成打卡
+                        </button>
+                    </h2>
+                    
+                    <div class="summary">
+                        <div class="summary-item">
+                            <div class="value" id="totalCalories">0</div>
+                            <div class="label">总热量 (kcal)</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="value" id="foodCount">0</div>
+                            <div class="label">记录条数</div>
+                        </div>
+                    </div>
+
+                    <!-- 进度条区域 -->
+                    <div class="progress-wrapper">
+                        <div class="goal-header">
+                            <span id="goalText">0 / 2000 kcal</span>
+                            <button class="goal-edit-btn" onclick="setDailyGoal()"><i data-lucide="target" style="width:14px;height:14px;"></i> 修改目标</button>
+                        </div>
+                        <div class="progress-bg">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 饮食明细列表 -->
+                <div class="card">
+                    <h2><i data-lucide="utensils"></i> 饮食明细</h2>
+                    <div id="mealsContainer"></div>
+                </div>
+
+                <!-- 趋势图表 -->
+                <div class="card">
+                    <h2><i data-lucide="bar-chart-3"></i> 热量趋势 (选中日期前7天)</h2>
+                    <div class="chart-container">
+                        <canvas id="calorieChart"></canvas>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button onclick="exportData()" class="btn-small btn-outline" style="flex: 1;">
+                            <i data-lucide="download"></i> 导出 JSON
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
+                        <button onclick="document.getElementById('importFile').click()" class="btn-small btn-success" style="flex: 1;">
+                            <i data-lucide="upload"></i> 导入 JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 注册 PWA Service Worker (静默运行，无需更改)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+
+        // 全局状态
+        let chartBar = null;
+        let foodData = {};
+        const todayStr = new Date().toISOString().split('T')[0];
+        let selectedDate = todayStr;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        let dailyGoal = parseInt(localStorage.getItem('foodTrackerGoal')) || 2000;
+        let editingId = null;
+        let editingDate = null;
+        let foodHistoryMap = {}; 
+
+        const mealTypes = {
+            breakfast: { icon: 'coffee', name: '早餐' },
+            lunch: { icon: 'utensils-crossed', name: '午餐' },
+            dinner: { icon: 'moon-star', name: '晚餐' },
+            snack: { icon: 'cookie', name: '加餐 / 零食' }
+        };
+
+        // 监听系统深色模式切换
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (chartBar) renderChart();
+        });
+        function getChartColors() {
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            return { textColor: isDark ? '#94a3b8' : '#666666', gridColor: isDark ? '#334155' : '#f0f4f8' };
+        }
+
+        // --- 游戏化特效：撒花与震动 ---
+        function finishToday() {
+            const dayData = foodData[selectedDate] ||[];
+            if(dayData.length === 0) {
+                alert('今天还没有记录哦，先去添加食物吧！🍎');
+                return;
+            }
+
+            // 手机端震动反馈 (哒-哒)
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+            // 撒花特效 (从屏幕两边往中间喷射)
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors:['#667eea', '#764ba2', '#2ed573', '#ff4757', '#ffa502']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors:['#667eea', '#764ba2', '#2ed573', '#ff4757', '#ffa502']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // 数据存储逻辑
+        function loadFoodData() {
+            const data = localStorage.getItem('foodTrackerDataV2');
+            if (data) {
+                foodData = JSON.parse(data);
+            } else {
+                const oldData = localStorage.getItem('foodTrackerData');
+                if (oldData) {
+                    foodData = JSON.parse(oldData);
+                    for(let date in foodData) foodData[date].forEach(item => { if(!item.meal) item.meal = 'snack'; });
+                    saveAllData();
+                }
+            }
+        }
+        function saveAllData() { localStorage.setItem('foodTrackerDataV2', JSON.stringify(foodData)); }
+        function saveFoodItem(food) {
+            if (!foodData[food.date]) foodData[food.date] = [];
+            foodData[food.date].push(food);
+            saveAllData();
+        }
+
+        function deleteFoodItem(id, date) {
+            if(confirm('确定要删除这条记录吗？')) {
+                // 删除时的轻微震动
+                if (navigator.vibrate) navigator.vibrate(30);
+                foodData[date] = foodData[date].filter(f => f.id !== id);
+                if (foodData[date].length === 0) delete foodData[date];
+                if(editingId === id) cancelEdit(); 
+                saveAllData();
+                updateUI();
+            }
+        }
+
+        function setDailyGoal() {
+            const newGoal = prompt('请输入每日热量目标 (kcal)：', dailyGoal);
+            if (newGoal && !isNaN(newGoal) && newGoal > 0) {
+                dailyGoal = parseInt(newGoal);
+                localStorage.setItem('foodTrackerGoal', dailyGoal);
+                updateUI();
+            }
+        }
+
+        function updateSuggestions() {
+            foodHistoryMap = {};
+            const datalist = document.getElementById('foodSuggestions');
+            datalist.innerHTML = '';
+            for (let date in foodData) {
+                foodData[date].forEach(item => { foodHistoryMap[item.name] = item.calories; });
+            }
+            for (let name in foodHistoryMap) {
+                const opt = document.createElement('option'); opt.value = name; datalist.appendChild(opt);
+            }
+        }
+
+        function editFoodItem(id, date) {
+            const item = foodData[date].find(f => f.id === id);
+            if(!item) return;
+            
+            editingId = id; editingDate = date;
+            
+            document.getElementById('date').value = date;
+            document.getElementById('meal').value = item.meal;
+            document.getElementById('name').value = item.name;
+            document.getElementById('calories').value = item.calories;
+            
+            document.getElementById('formTitle').textContent = '编辑记录';
+            document.getElementById('submitBtnText').textContent = '保存修改';
+            document.getElementById('submitIcon').setAttribute('data-lucide', 'save');
+            document.getElementById('cancelEditBtn').style.display = 'flex';
+            
+            lucide.createIcons();
+            
+            if(window.innerWidth <= 768) {
+                document.getElementById('formCard').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        function cancelEdit() {
+            editingId = null; editingDate = null;
+            document.getElementById('foodForm').reset();
+            document.getElementById('date').value = selectedDate;
+            
+            document.getElementById('formTitle').textContent = '添加记录';
+            document.getElementById('submitBtnText').textContent = '添加记录';
+            document.getElementById('submitIcon').setAttribute('data-lucide', 'plus');
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            lucide.createIcons();
+        }
+
+        // 渲染 UI 模块
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const display = document.getElementById('monthYearDisplay');
+            grid.innerHTML = '';
+            
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            display.textContent = `${currentYear}年 ${currentMonth + 1}月`;['日', '一', '二', '三', '四', '五', '六'].forEach(d => {
+                const el = document.createElement('div');
+                el.className = 'calendar-day-header'; el.textContent = d;
+                grid.appendChild(el);
+            });
+
+            for (let i = 0; i < firstDay; i++) {
+                const el = document.createElement('div'); el.className = 'calendar-day empty'; grid.appendChild(el);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const el = document.createElement('div');
+                el.className = 'calendar-day'; el.textContent = i;
+                
+                if (dateStr === todayStr) el.classList.add('today');
+                if (dateStr === selectedDate) el.classList.add('selected');
+                if (foodData[dateStr] && foodData[dateStr].length > 0) {
+                    const dot = document.createElement('div'); dot.className = 'has-data-dot'; el.appendChild(dot);
+                }
+
+                el.onclick = () => {
+                    selectedDate = dateStr;
+                    if(!editingId) document.getElementById('date').value = selectedDate; 
+                    updateUI();
+                };
+                grid.appendChild(el);
+            }
+        }
+
+        function renderDailyDetails() {
+            const container = document.getElementById('mealsContainer');
+            document.getElementById('selectedDateTitle').textContent = selectedDate === todayStr ? '今日摄入' : `${selectedDate} 摄入`;
+            container.innerHTML = '';
+
+            const dayData = foodData[selectedDate] ||[];
+            let totalCal = 0;
+
+            Object.keys(mealTypes).forEach(mealKey => {
+                const mealItems = dayData.filter(item => item.meal === mealKey);
+                const mealSubtotal = mealItems.reduce((sum, item) => sum + item.calories, 0);
+                totalCal += mealSubtotal;
+
+                const section = document.createElement('div'); section.className = 'meal-section';
+                section.innerHTML = `
+                    <div class="meal-header">
+                        <div class="meal-title"><i data-lucide="${mealTypes[mealKey].icon}"></i> ${mealTypes[mealKey].name}</div>
+                        <div class="meal-subtotal">${mealSubtotal > 0 ? mealSubtotal + ' kcal' : ''}</div>
+                    </div>
+                `;
+
+                if (mealItems.length > 0) {
+                    mealItems.forEach(food => {
+                        const itemEl = document.createElement('div'); itemEl.className = 'food-item';
+                        itemEl.innerHTML = `
+                            <div class="food-info">
+                                <div class="food-name">${food.name}</div>
+                                <div class="food-cal">${food.calories} kcal</div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-small btn-outline" onclick="editFoodItem(${food.id}, '${food.date}')"><i data-lucide="pencil" style="width:14px;height:14px;"></i></button>
+                                <button class="btn-small btn-danger" onclick="deleteFoodItem(${food.id}, '${food.date}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                            </div>
+                        `;
+                        section.appendChild(itemEl);
+                    });
+                } else {
+                    const empty = document.createElement('div'); empty.className = 'empty-message'; empty.textContent = '暂无记录';
+                    section.appendChild(empty);
+                }
+                container.appendChild(section);
+            });
+
+            totalCal = parseFloat(totalCal.toFixed(1));
+            document.getElementById('totalCalories').textContent = totalCal;
+            document.getElementById('foodCount').textContent = dayData.length;
+            
+            const percent = Math.min((totalCal / dailyGoal) * 100, 100);
+            const fill = document.getElementById('progressFill');
+            fill.style.width = percent + '%';
+            
+            fill.className = 'progress-fill'; 
+            if (totalCal > dailyGoal) fill.classList.add('danger');
+            else if (totalCal > dailyGoal * 0.85) fill.classList.add('warning');
+            
+            document.getElementById('goalText').textContent = `${totalCal} / ${dailyGoal} kcal`;
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('calorieChart');
+            if (chartBar) chartBar.destroy();
+
+            const dates =[], totals =[];
+            const baseDate = new Date(selectedDate);
+            const chartColors = getChartColors();
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(baseDate); d.setDate(d.getDate() - i);
+                const dStr = d.toISOString().split('T')[0];
+                dates.push(`${d.getMonth() + 1}/${d.getDate()}`);
+                totals.push(foodData[dStr] ? foodData[dStr].reduce((sum, f) => sum + f.calories, 0) : 0);
+            }
+
+            chartBar = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets:[{
+                        label: '总热量 (kcal)', data: totals,
+                        backgroundColor: 'rgba(129, 140, 248, 0.85)', borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: chartColors.gridColor }, ticks: { color: chartColors.textColor } },
+                        x: { grid: { display: false }, ticks: { color: chartColors.textColor } }
+                    }
+                }
+            });
+        }
+
+        function updateUI() {
+            renderCalendar();
+            renderDailyDetails();
+            renderChart();
+            updateSuggestions();
+            lucide.createIcons();
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(foodData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `food-tracker-${todayStr}.json`; a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data && typeof data === 'object') {
+                        foodData = data; saveAllData(); updateUI(); alert('导入成功！');
+                    }
+                } catch (err) { alert('文件格式错误！'); }
+            };
+            reader.readAsText(file);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFoodData();
+            document.getElementById('date').value = todayStr;
+
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } updateUI();
+            });
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } updateUI();
+            });
+
+            document.getElementById('name').addEventListener('input', (e) => {
+                const name = e.target.value.trim();
+                if (foodHistoryMap[name]) document.getElementById('calories').value = foodHistoryMap[name];
+            });
+
+            document.getElementById('foodForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                // 提交时的轻微震动
+                if (navigator.vibrate) navigator.vibrate(40);
+
+                const formDate = document.getElementById('date').value;
+                const foodItem = {
+                    id: editingId || Date.now(), 
+                    date: formDate,
+                    meal: document.getElementById('meal').value,
+                    name: document.getElementById('name').value.trim(),
+                    calories: parseFloat(document.getElementById('calories').value)
+                };
+
+                if (editingId) {
+                    foodData[editingDate] = foodData[editingDate].filter(f => f.id !== editingId);
+                    if (foodData[editingDate].length === 0) delete foodData[editingDate];
+                    cancelEdit(); 
+                } else {
+                    document.getElementById('name').value = '';
+                    document.getElementById('calories').value = '';
+                }
+
+                saveFoodItem(foodItem);
+                
+                if (formDate !== selectedDate) {
+                    selectedDate = formDate;
+                    const d = new Date(selectedDate);
+                    currentYear = d.getFullYear();
+                    currentMonth = d.getMonth();
+                }
+                updateUI();
+            });
+
+            updateUI();
+        });
+    </script>
+</body>
+</html>
