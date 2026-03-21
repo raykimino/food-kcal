@@ -2,8 +2,11 @@
 import { computed } from 'vue'
 import { useFoodStore } from '@/stores/food'
 import { PieChart, CheckCircle, Target } from 'lucide-vue-next'
+import { useToast } from 'vue-toastification'
+import Swal from 'sweetalert2'
 
 const foodStore = useFoodStore()
+const toast = useToast()
 const emit = defineEmits<{
   finishToday: []
 }>()
@@ -16,10 +19,25 @@ const goalText = computed(() => {
   return `${foodStore.dailySummary.totalCalories} / ${foodStore.dailyGoal} kcal`
 })
 
-const setDailyGoal = () => {
-  const v = prompt('请输入每日热量目标 (kcal)：', foodStore.dailyGoal.toString())
-  if (v && !isNaN(parseInt(v)) && parseInt(v) > 0) {
-    foodStore.setDailyGoal(parseInt(v))
+const setDailyGoal = async () => {
+  const { value } = await Swal.fire({
+    title: '修改每日目标',
+    input: 'number',
+    inputLabel: '每日热量目标 (kcal)',
+    inputValue: foodStore.dailyGoal,
+    inputAttributes: { min: '1', step: '1' },
+    showCancelButton: true,
+    confirmButtonText: '保存',
+    cancelButtonText: '取消',
+    confirmButtonColor: 'var(--primary, #667eea)',
+    inputValidator: (value) => {
+      if (!value || parseInt(value) <= 0) return '请输入有效的热量目标'
+    }
+  })
+
+  if (value) {
+    foodStore.setDailyGoal(parseInt(value))
+    toast.success(`每日目标已设为 ${value} kcal`)
   }
 }
 </script>

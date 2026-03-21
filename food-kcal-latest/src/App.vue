@@ -8,8 +8,10 @@ import MealDetails from '@/components/MealDetails.vue'
 import ChartStats from '@/components/ChartStats.vue'
 import Loading from '@/components/Loading.vue'
 import { Apple } from 'lucide-vue-next'
+import { useToast } from 'vue-toastification'
 
 const foodStore = useFoodStore()
+const toast = useToast()
 const vibrateSupported = ref(false)
 const isAppReady = ref(false)
 
@@ -91,7 +93,7 @@ onMounted(() => {
 const finishToday = () => {
   const dayData = foodStore.selectedDayData
   if (dayData.length === 0) {
-    alert('今天还没有记录哦，先去添加食物吧！🍎')
+    toast.warning('今天还没有记录哦，先去添加食物吧！')
     return
   }
   
@@ -342,10 +344,28 @@ button svg {
   align-items: center; 
   gap: 4px;
 }
-.btn-ghost:hover { 
-  background: none; 
-  transform: none; 
-  box-shadow: none; 
-  color: var(--primary); 
+.btn-ghost:hover {
+  background: none;
+  transform: none;
+  box-shadow: none;
+  color: var(--primary);
+}
+
+/* 修复全局 button 样式污染 vue-toastification 内部按钮 */
+.Vue-Toastification__close-button {
+  width: auto !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  transform: none !important;
+  min-width: unset !important;
+}
+.Vue-Toastification__close-button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 </style>

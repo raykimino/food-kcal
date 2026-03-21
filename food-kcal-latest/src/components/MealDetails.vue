@@ -2,54 +2,59 @@
 import { computed } from 'vue'
 import { useFoodStore } from '@/stores/food'
 import type { FoodItem, MealType } from '@/types'
-import { 
-  Utensils, 
-  Copy, 
-  CheckSquare, 
-  Coffee, 
-  UtensilsCrossed, 
-  MoonStar, 
+import {
+  Utensils,
+  Copy,
+  CheckSquare,
+  Coffee,
+  UtensilsCrossed,
+  MoonStar,
   Cookie,
   Pencil,
   Trash2,
   X
 } from 'lucide-vue-next'
+import { useToast } from 'vue-toastification'
+import Swal from 'sweetalert2'
 
 const foodStore = useFoodStore()
+const toast = useToast()
 
 // 复制记录
-const copyFromDate = () => {
-  const srcDate = prompt('请输入要复制的日期（格式 YYYY-MM-DD）：')
+const copyFromDate = async () => {
+  const { value: srcDate } = await Swal.fire({
+    title: '复制其他日期记录',
+    input: 'text',
+    inputLabel: '请输入要复制的日期',
+    inputPlaceholder: 'YYYY-MM-DD',
+    inputValue: '',
+    showCancelButton: true,
+    confirmButtonText: '复制',
+    cancelButtonText: '取消',
+    confirmButtonColor: 'var(--primary, #667eea)',
+    inputValidator: (value) => {
+      if (!value) return '请输入日期'
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '日期格式不正确，请使用 YYYY-MM-DD'
+      if (value === foodStore.selectedDate) return '不能复制到同一天'
+    }
+  })
+
   if (!srcDate) return
-  
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(srcDate)) {
-    alert('日期格式不正确')
-    return
-  }
-  
-  if (srcDate === foodStore.selectedDate) {
-    alert('不能复制到同一天')
-    return
-  }
-  
+
   try {
     foodStore.copyFromDate(srcDate)
-    
-    if ('vibrate' in navigator) {
-      navigator.vibrate(40)
-    }
+    if ('vibrate' in navigator) navigator.vibrate(40)
+    toast.success(`已从 ${srcDate} 复制记录`)
   } catch (error: any) {
-    alert(error.message)
+    toast.error(error.message)
   }
 }
 
 // 快速克隆
 const cloneFoodItem = (item: FoodItem) => {
   foodStore.cloneFoodItem(item)
-  
-  if ('vibrate' in navigator) {
-    navigator.vibrate(30)
-  }
+  if ('vibrate' in navigator) navigator.vibrate(30)
+  toast.success(`已复制「${item.name}」`)
 }
 
 // 编辑食物
@@ -62,12 +67,21 @@ const editFoodItem = (id: number, date: string) => {
 }
 
 // 删除食物
-const deleteFoodItem = (id: number, date: string) => {
-  if (confirm('确定要删除这条记录吗？')) {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(30)
-    }
+const deleteFoodItem = async (id: number, date: string) => {
+  const result = await Swal.fire({
+    title: '确认删除',
+    text: '确定要删除这条记录吗？',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    confirmButtonColor: '#ff4757'
+  })
+
+  if (result.isConfirmed) {
+    if ('vibrate' in navigator) navigator.vibrate(30)
     foodStore.deleteFoodItem(id, date)
+    toast.success('记录已删除')
   }
 }
 
@@ -90,21 +104,27 @@ const selectAllItems = () => {
   foodStore.selectAllItems()
 }
 
-const deleteSelectedItems = () => {
+const deleteSelectedItems = async () => {
   if (foodStore.batchSelected.size === 0) {
-    alert('请先选择要删除的记录')
+    toast.warning('请先选择要删除的记录')
     return
   }
-  
-  if (!confirm(`确定删除选中的 ${foodStore.batchSelected.size} 条记录？`)) {
-    return
-  }
-  
-  if ('vibrate' in navigator) {
-    navigator.vibrate([30, 30, 30])
-  }
-  
+
+  const result = await Swal.fire({
+    title: '批量删除',
+    text: `确定删除选中的 ${foodStore.batchSelected.size} 条记录？`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '全部删除',
+    cancelButtonText: '取消',
+    confirmButtonColor: '#ff4757'
+  })
+
+  if (!result.isConfirmed) return
+
+  if ('vibrate' in navigator) navigator.vibrate([30, 30, 30])
   foodStore.deleteSelectedItems()
+  toast.success('已删除所选记录')
 }
 </script>
 

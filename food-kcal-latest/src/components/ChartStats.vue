@@ -3,8 +3,10 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useFoodStore } from '@/stores/food'
 import { BarChart3, Download, Upload } from 'lucide-vue-next'
 import type { Chart, ChartData, ChartOptions } from 'chart.js'
+import { useToast } from 'vue-toastification'
 
 const foodStore = useFoodStore()
+const toast = useToast()
 const calorieChart = ref<HTMLCanvasElement>()
 let chartInstance: Chart | null = null
 
@@ -175,11 +177,11 @@ const importData = (event: Event) => {
     if (jsonData) {
       const success = foodStore.importData(jsonData)
       if (success) {
-        alert('导入成功！')
+        toast.success('数据导入成功')
         // 触发全局更新
         foodStore.refreshData()
       } else {
-        alert('文件格式错误！')
+        toast.error('文件格式错误，请选择正确的 JSON 文件')
       }
     }
     if (input) {

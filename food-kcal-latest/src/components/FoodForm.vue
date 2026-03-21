@@ -3,8 +3,10 @@ import { ref, computed, watch } from 'vue'
 import { useFoodStore } from '@/stores/food'
 import type { FoodItem, FavoriteFood } from '@/types'
 import { PenLine, Plus, Save, X, Star, ChevronRight, ChevronDown } from 'lucide-vue-next'
+import { useToast } from 'vue-toastification'
 
 const foodStore = useFoodStore()
+const toast = useToast()
 
 // 表单数据
 const formData = ref<Partial<FoodItem>>({
@@ -37,7 +39,7 @@ const saveToFavorites = () => {
   const calories = formData.value.calories
   
   if (!name || !calories || calories <= 0) {
-    alert('请先填写食物名称和热量')
+    toast.warning('请先填写食物名称和热量')
     return
   }
 
@@ -50,12 +52,13 @@ const saveToFavorites = () => {
       fat: formData.value.fat
     }
     foodStore.addFavorite(favorite)
-    
+    toast.success(`「${name}」已加入收藏夹`)
+
     if ('vibrate' in navigator) {
       navigator.vibrate(30)
     }
   } catch (error: any) {
-    alert(error.message)
+    toast.error(error.message)
   }
 }
 
@@ -102,7 +105,7 @@ const handleSubmit = (e: Event) => {
   e.preventDefault()
   
   if (!formData.value.name?.trim() || !formData.value.calories) {
-    alert('请填写食物名称和热量')
+    toast.warning('请填写食物名称和热量')
     return
   }
 
@@ -129,8 +132,10 @@ const handleSubmit = (e: Event) => {
   if (isEditing.value) {
     foodStore.deleteFoodItem(foodItem.id, foodStore.editingDate!)
     cancelEdit()
+    toast.success(`「${foodItem.name}」已更新`)
   } else {
     resetForm()
+    toast.success(`已添加「${foodItem.name}」`)
   }
 
   foodStore.saveFoodItem(foodItem)
