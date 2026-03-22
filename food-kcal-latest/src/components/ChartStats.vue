@@ -24,7 +24,29 @@ const chartData = ref<ChartData<'bar'>>({
 const chartOptions = ref<ChartOptions<'bar'>>({
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
+  plugins: { 
+    legend: { display: false },
+    annotation: {
+      annotations: {
+        goalLine: {
+          type: 'line',
+          yMin: foodStore.dailyGoal,
+          yMax: foodStore.dailyGoal,
+          borderColor: 'rgba(255, 71, 87, 0.6)',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          label: {
+            display: true,
+            content: `目标: ${foodStore.dailyGoal} kcal`,
+            position: 'end',
+            backgroundColor: 'rgba(255, 71, 87, 0.8)',
+            color: '#fff',
+            font: { size: 11 }
+          }
+        }
+      }
+    }
+  },
   scales: {
     y: { 
       beginAtZero: true, 
@@ -131,7 +153,30 @@ const renderChart = async () => {
   chartOptions.value = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
+    plugins: { 
+      legend: { display: false },
+      annotation: {
+        annotations: {
+          goalLine: {
+            type: 'line' as const,
+            yMin: foodStore.dailyGoal,
+            yMax: foodStore.dailyGoal,
+            borderColor: 'rgba(255, 71, 87, 0.7)',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: `目标: ${foodStore.dailyGoal} kcal`,
+              position: 'end' as const,
+              backgroundColor: 'rgba(255, 71, 87, 0.85)',
+              color: '#fff',
+              font: { size: 11 },
+              padding: { x: 6, y: 3 }
+            }
+          }
+        }
+      }
+    },
     scales: {
       y: { 
         beginAtZero: true, 
@@ -146,6 +191,9 @@ const renderChart = async () => {
   }
   
   const ChartLib = await import('chart.js/auto')
+  const annotationPlugin = await import('chartjs-plugin-annotation')
+  ChartLib.Chart.register(annotationPlugin.default)
+  
   chartInstance = new ChartLib.Chart(calorieChart.value, {
     type: 'bar',
     data: chartData.value,
@@ -221,7 +269,8 @@ onUnmounted(() => {
 watch(() => [
   foodStore.chartView,
   foodStore.selectedDate,
-  foodStore.foodData
+  foodStore.foodData,
+  foodStore.dailyGoal
 ], () => {
   renderChart()
 }, { deep: true })

@@ -20,6 +20,8 @@ const goalText = computed(() => {
 })
 
 const setDailyGoal = async () => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  
   const { value } = await Swal.fire({
     title: '修改每日目标',
     input: 'number',
@@ -29,7 +31,10 @@ const setDailyGoal = async () => {
     showCancelButton: true,
     confirmButtonText: '保存',
     cancelButtonText: '取消',
-    confirmButtonColor: 'var(--primary, #667eea)',
+    confirmButtonColor: isDark ? '#818cf8' : '#667eea',
+    cancelButtonColor: isDark ? '#475569' : '#666',
+    background: isDark ? '#1e293b' : '#fff',
+    color: isDark ? '#f8fafc' : '#2c3e50',
     inputValidator: (value) => {
       if (!value || parseInt(value) <= 0) return '请输入有效的热量目标'
     }
