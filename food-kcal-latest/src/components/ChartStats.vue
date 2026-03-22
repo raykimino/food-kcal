@@ -349,13 +349,13 @@ watch(() => [
 .chart-tabs {
   display: flex;
   gap: 6px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .chart-tab {
   flex: 1;
   padding: 6px 8px;
-  font-size: 0.85em;
+  font-size: 0.8em;
   border-radius: 8px;
   font-weight: 600;
   background: var(--item-bg);
@@ -387,33 +387,49 @@ watch(() => [
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 15px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .stat-item {
   background: var(--item-bg);
-  padding: 10px;
+  padding: 8px 6px;
   border-radius: 10px;
   text-align: center;
   border: 1px solid var(--border-color);
 }
 
 .stat-item .s-val {
-  font-size: 1.1em;
+  font-size: 1em;
   font-weight: bold;
   color: var(--primary);
 }
 
 .stat-item .s-label {
-  font-size: 0.78em;
+  font-size: 0.72em;
   color: var(--text-light);
   margin-top: 2px;
 }
 
+@media (max-width: 400px) {
+  .stat-item .s-val {
+    font-size: 0.9em;
+  }
+  
+  .stat-item .s-label {
+    font-size: 0.65em;
+  }
+}
+
 .chart-container {
   position: relative;
-  height: 250px;
+  height: 220px;
   width: 100%;
+}
+
+@media (max-width: 400px) {
+  .chart-container {
+    height: 180px;
+  }
 }
 </style>

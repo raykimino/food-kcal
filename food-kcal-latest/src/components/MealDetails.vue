@@ -22,6 +22,8 @@ const toast = useToast()
 
 // 复制记录
 const copyFromDate = async () => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
   const { value: srcDate } = await Swal.fire({
     title: '复制其他日期记录',
     input: 'text',
@@ -31,7 +33,10 @@ const copyFromDate = async () => {
     showCancelButton: true,
     confirmButtonText: '复制',
     cancelButtonText: '取消',
-    confirmButtonColor: 'var(--primary, #667eea)',
+    confirmButtonColor: isDark ? '#818cf8' : '#667eea',
+    cancelButtonColor: isDark ? '#475569' : '#666',
+    background: isDark ? '#1e293b' : '#fff',
+    color: isDark ? '#f8fafc' : '#2c3e50',
     inputValidator: (value) => {
       if (!value) return '请输入日期'
       if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '日期格式不正确，请使用 YYYY-MM-DD'
@@ -248,7 +253,16 @@ const deleteSelectedItems = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 400px) {
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .batch-bar {
@@ -258,19 +272,20 @@ const deleteSelectedItems = async () => {
   padding: 10px 0;
   border-top: 1px solid var(--border-color);
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .meal-section {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .meal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 6px 0;
   border-bottom: 2px solid var(--btn-header-bg);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .meal-title {
@@ -278,11 +293,12 @@ const deleteSelectedItems = async () => {
   color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  font-size: 0.95em;
 }
 
 .meal-subtotal {
-  font-size: 0.9em;
+  font-size: 0.85em;
   color: var(--text-light);
   font-weight: 500;
 }
@@ -291,13 +307,13 @@ const deleteSelectedItems = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background: var(--item-bg);
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   transition: background 0.2s, border-color 0.2s;
   border: 1px solid transparent;
-  gap: 10px;
+  gap: 8px;
 }
 .food-item:hover {
   background: var(--item-hover);
@@ -319,32 +335,47 @@ const deleteSelectedItems = async () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.95em;
 }
 
 .food-cal {
   color: var(--text-light);
-  font-size: 0.9em;
+  font-size: 0.85em;
   margin-top: 2px;
 }
 
 .food-macros {
   color: var(--text-light);
-  font-size: 0.8em;
+  font-size: 0.75em;
   margin-top: 2px;
 }
 
 .item-actions {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
   align-items: center;
+}
+
+@media (max-width: 400px) {
+  .item-actions {
+    gap: 3px;
+  }
+  
+  .item-actions .btn-small {
+    padding: 4px 8px;
+  }
+  
+  .food-macros {
+    font-size: 0.7em;
+  }
 }
 
 .empty-message {
   text-align: center;
   color: var(--text-light);
-  padding: 20px;
-  font-size: 0.9em;
+  padding: 16px;
+  font-size: 0.85em;
 }
 
 .item-checkbox {

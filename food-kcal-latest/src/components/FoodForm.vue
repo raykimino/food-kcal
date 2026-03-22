@@ -104,8 +104,33 @@ const cancelEdit = () => {
 const handleSubmit = (e: Event) => {
   e.preventDefault()
   
-  if (!formData.value.name?.trim() || !formData.value.calories) {
-    toast.warning('请填写食物名称和热量')
+  if (!formData.value.name?.trim()) {
+    toast.warning('请填写食物名称')
+    return
+  }
+  
+  if (!formData.value.calories || formData.value.calories <= 0) {
+    toast.warning('请填写有效的热量值')
+    return
+  }
+  
+  if (formData.value.calories > 10000) {
+    toast.warning('热量值不能超过 10000 kcal')
+    return
+  }
+  
+  if (formData.value.protein && (formData.value.protein < 0 || formData.value.protein > 500)) {
+    toast.warning('蛋白质值超出合理范围 (0-500g)')
+    return
+  }
+  
+  if (formData.value.carbs && (formData.value.carbs < 0 || formData.value.carbs > 1000)) {
+    toast.warning('碳水值超出合理范围 (0-1000g)')
+    return
+  }
+  
+  if (formData.value.fat && (formData.value.fat < 0 || formData.value.fat > 500)) {
+    toast.warning('脂肪值超出合理范围 (0-500g)')
     return
   }
 
@@ -334,25 +359,25 @@ watch(() => foodStore.editingId, (editingId) => {
 
 <style scoped>
 .favorites-section {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .favorites-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  min-height: 28px;
+  gap: 5px;
+  min-height: 26px;
 }
 
 .fav-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  gap: 3px;
+  padding: 3px 8px;
   background: var(--item-bg);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  font-size: 0.82em;
+  font-size: 0.78em;
   cursor: pointer;
   color: var(--text-main);
   transition: background 0.2s;
@@ -373,7 +398,7 @@ watch(() => foodStore.editingId, (editingId) => {
 }
 
 .fav-empty {
-  font-size: 0.82em;
+  font-size: 0.78em;
   color: var(--text-light);
   padding: 4px 0;
 }
@@ -384,7 +409,7 @@ watch(() => foodStore.editingId, (editingId) => {
   background: none;
   border: none;
   color: var(--text-light);
-  font-size: 0.85em;
+  font-size: 0.8em;
   padding: 4px 0;
   cursor: pointer;
   display: flex;
@@ -401,18 +426,34 @@ watch(() => foodStore.editingId, (editingId) => {
 
 .macro-inputs {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-top: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
 }
 .macro-inputs .form-group {
   margin-bottom: 0;
 }
 .macro-inputs label {
-  font-size: 0.8em;
+  font-size: 0.75em;
 }
 .macro-inputs input {
-  padding: 7px 10px;
-  font-size: 0.9em;
+  padding: 6px 8px;
+  font-size: 0.85em;
+}
+
+@media (max-width: 400px) {
+  .macro-inputs {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  
+  .macro-inputs label {
+    font-size: 0.7em;
+  }
+  
+  .macro-inputs input {
+    padding: 5px 6px;
+    font-size: 0.8em;
+  }
 }
 </style>

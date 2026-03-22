@@ -283,7 +283,12 @@ export const useFoodStore = defineStore('food', () => {
       foodData.value[targetDate] = []
     }
 
+    const targetNames = new Set(foodData.value[targetDate].map(item => item.name))
+
     srcItems.forEach(item => {
+      if (targetNames.has(item.name)) {
+        return
+      }
       if (foodData.value[targetDate]) {
         foodData.value[targetDate].push({
           ...item,

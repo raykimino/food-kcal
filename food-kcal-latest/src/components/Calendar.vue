@@ -103,8 +103,9 @@ const handleDayClick = (date: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   font-weight: bold;
+  font-size: 0.95em;
 }
 
 .calendar-header button {
@@ -123,7 +124,7 @@ const handleDayClick = (date: string) => {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 3px;
   text-align: center;
 }
 
@@ -134,9 +135,16 @@ const handleDayClick = (date: string) => {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  font-size: 0.9em;
+  font-size: 0.85em;
   position: relative;
   transition: background 0.2s;
+  padding: 4px 0;
+}
+
+@media (max-width: 400px) {
+  .calendar-cell {
+    font-size: 0.75em;
+  }
 }
 
 .calendar-day-header {
@@ -177,7 +185,7 @@ const handleDayClick = (date: string) => {
   background: var(--success);
   border-radius: 50%;
   position: absolute;
-  bottom: 4px;
+  bottom: 3px;
 }
 .calendar-day.selected .has-data-dot {
   background: white;

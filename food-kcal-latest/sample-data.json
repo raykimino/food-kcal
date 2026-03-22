@@ -1,0 +1,208 @@
+{
+  "2026-03-20": [
+    {
+      "id": 1742659200000,
+      "date": "2026-03-20",
+      "meal": "breakfast",
+      "name": "燕麦片",
+      "calories": 150,
+      "protein": 5.0,
+      "carbs": 27.0,
+      "fat": 3.0
+    },
+    {
+      "id": 1742659200001,
+      "date": "2026-03-20",
+      "meal": "breakfast",
+      "name": "牛奶",
+      "calories": 65,
+      "protein": 3.4,
+      "carbs": 4.8,
+      "fat": 3.6
+    },
+    {
+      "id": 1742659200002,
+      "date": "2026-03-20",
+      "meal": "lunch",
+      "name": "米饭",
+      "calories": 232,
+      "protein": 4.3,
+      "carbs": 50.0,
+      "fat": 0.5
+    },
+    {
+      "id": 1742659200003,
+      "date": "2026-03-20",
+      "meal": "lunch",
+      "name": "鸡胸肉",
+      "calories": 165,
+      "protein": 31.0,
+      "carbs": 0,
+      "fat": 3.6
+    },
+    {
+      "id": 1742659200004,
+      "date": "2026-03-20",
+      "meal": "lunch",
+      "name": "西兰花",
+      "calories": 55,
+      "protein": 3.7,
+      "carbs": 7.2,
+      "fat": 0.6
+    },
+    {
+      "id": 1742659200005,
+      "date": "2026-03-20",
+      "meal": "snack",
+      "name": "苹果",
+      "calories": 52,
+      "protein": 0.3,
+      "carbs": 14.0,
+      "fat": 0.2
+    },
+    {
+      "id": 1742659200006,
+      "date": "2026-03-20",
+      "meal": "dinner",
+      "name": "三文鱼",
+      "calories": 208,
+      "protein": 20.0,
+      "carbs": 0,
+      "fat": 13.0
+    },
+    {
+      "id": 1742659200007,
+      "date": "2026-03-20",
+      "meal": "dinner",
+      "name": "糙米饭",
+      "calories": 218,
+      "protein": 4.5,
+      "carbs": 46.0,
+      "fat": 1.8
+    }
+  ],
+  "2026-03-19": [
+    {
+      "id": 1742572800000,
+      "date": "2026-03-19",
+      "meal": "breakfast",
+      "name": "全麦面包",
+      "calories": 120,
+      "protein": 4.0,
+      "carbs": 22.0,
+      "fat": 2.0
+    },
+    {
+      "id": 1742572800001,
+      "date": "2026-03-19",
+      "meal": "breakfast",
+      "name": "煎蛋",
+      "calories": 110,
+      "protein": 7.0,
+      "carbs": 0.5,
+      "fat": 9.0
+    },
+    {
+      "id": 1742572800002,
+      "date": "2026-03-19",
+      "meal": "lunch",
+      "name": "牛肉面",
+      "calories": 580,
+      "protein": 25.0,
+      "carbs": 72.0,
+      "fat": 18.0
+    },
+    {
+      "id": 1742572800003,
+      "date": "2026-03-19",
+      "meal": "snack",
+      "name": "酸奶",
+      "calories": 100,
+      "protein": 5.0,
+      "carbs": 12.0,
+      "fat": 2.5
+    },
+    {
+      "id": 1742572800004,
+      "date": "2026-03-19",
+      "meal": "dinner",
+      "name": "番茄炒蛋",
+      "calories": 180,
+      "protein": 12.0,
+      "carbs": 8.0,
+      "fat": 11.0
+    }
+  ],
+  "2026-03-18": [
+    {
+      "id": 1742486400000,
+      "date": "2026-03-18",
+      "meal": "breakfast",
+      "name": "豆浆",
+      "calories": 85,
+      "protein": 8.0,
+      "carbs": 4.0,
+      "fat": 3.5
+    },
+    {
+      "id": 1742486400001,
+      "date": "2026-03-18",
+      "meal": "breakfast",
+      "name": "油条",
+      "calories": 195,
+      "protein": 4.0,
+      "carbs": 25.0,
+      "fat": 9.0
+    },
+    {
+      "id": 1742486400002,
+      "date": "2026-03-18",
+      "meal": "lunch",
+      "name": "宫保鸡丁",
+      "calories": 320,
+      "protein": 22.0,
+      "carbs": 15.0,
+      "fat": 20.0
+    },
+    {
+      "id": 1742486400003,
+      "date": "2026-03-18",
+      "meal": "lunch",
+      "name": "米饭",
+      "calories": 232,
+      "protein": 4.3,
+      "carbs": 50.0,
+      "fat": 0.5
+    },
+    {
+      "id": 1742486400004,
+      "date": "2026-03-18",
+      "meal": "snack",
+      "name": "香蕉",
+      "calories": 90,
+      "protein": 1.1,
+      "carbs": 23.0,
+      "fat": 0.3
+    },
+    {
+      "id": 1742486400005,
+      "date": "2026-03-18",
+      "meal": "dinner",
+      "name": "清蒸鲈鱼",
+      "calories": 145,
+      "protein": 25.0,
+      "carbs": 1.5,
+      "fat": 3.5
+    },
+    {
+      "id": 1742486400006,
+      "date": "2026-03-18",
+      "meal": "dinner",
+      "name": "凉拌黄瓜",
+      "calories": 35,
+      "protein": 0.8,
+      "carbs": 5.0,
+      "fat": 0.2
+    }
+  ]
+}

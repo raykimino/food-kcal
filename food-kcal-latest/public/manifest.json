@@ -3,7 +3,7 @@
   "short_name": "热量记录",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4f7f8",
+  "background_color": "#1e293b",
   "theme_color": "#667eea",
   "icons":[
     {

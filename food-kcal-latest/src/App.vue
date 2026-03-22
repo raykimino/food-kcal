@@ -61,7 +61,18 @@ const cssVars = computed(() => ({
 
 onMounted(() => {
   vibrateSupported.value = 'vibrate' in navigator
-  
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (foodStore.batchMode) {
+        foodStore.toggleBatchMode()
+      }
+      if (foodStore.editingId) {
+        foodStore.setEditingItem(null, null)
+      }
+    }
+  })
+
   if ('serviceWorker' in navigator) {
     // 在生产环境才启用 Service Worker
     if (import.meta.env.PROD) {
@@ -142,32 +153,43 @@ const finishToday = () => {
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 12px;
 }
 
 h1 {
   text-align: center;
   color: var(--text-main);
-  margin-bottom: 30px;
-  font-size: 2.2em;
+  margin-bottom: 20px;
+  font-size: 1.8em;
   font-weight: 800;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .app-layout {
   display: grid;
-  grid-template-columns: 350px 1fr;
+  grid-template-columns: 340px 1fr;
   gap: 20px;
   align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .app-layout {
     grid-template-columns: 1fr;
-    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+  }
+  
+  .app-layout {
+    gap: 12px;
   }
 }
 </style>
@@ -223,19 +245,33 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg-color); 
   min-height: 100vh; 
-  padding: 20px;
+  padding: 16px;
   color: var(--text-main); 
   transition: background-color 0.3s, color 0.3s;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
 }
 
 .card {
   background: var(--card-bg); 
   border-radius: 16px; 
-  padding: 20px;
-  margin-bottom: 20px; 
+  padding: 16px;
+  margin-bottom: 16px; 
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   border: 1px solid rgba(0,0,0,0.04); 
   transition: background-color 0.3s, border-color 0.3s;
+}
+
+@media (max-width: 480px) {
+  .card {
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
 }
 
 .card h2 { 

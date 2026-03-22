@@ -112,55 +112,79 @@ const setDailyGoal = async () => {
 .summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 12px;
   margin-bottom: 15px;
 }
 
 .summary-item {
   background: var(--item-bg);
-  padding: 15px;
+  padding: 12px;
   border-radius: 12px;
   text-align: center;
   border: 1px solid var(--border-color);
 }
 
 .summary-item .value {
-  font-size: 1.8em;
+  font-size: 1.6em;
   font-weight: bold;
   color: var(--primary);
 }
 
 .summary-item .label {
-  font-size: 0.85em;
+  font-size: 0.8em;
   color: var(--text-light);
-  margin-top: 5px;
+  margin-top: 4px;
+}
+
+@media (max-width: 400px) {
+  .summary-item .value {
+    font-size: 1.4em;
+  }
+  
+  .summary-item {
+    padding: 10px;
+  }
 }
 
 .macro-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 15px;
 }
 
 .macro-item {
   background: var(--item-bg);
-  padding: 10px;
+  padding: 8px 6px;
   border-radius: 10px;
   text-align: center;
   border: 1px solid var(--border-color);
 }
 
 .macro-item .m-val {
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: bold;
   color: var(--secondary);
 }
 
 .macro-item .m-label {
-  font-size: 0.78em;
+  font-size: 0.72em;
   color: var(--text-light);
-  margin-top: 3px;
+  margin-top: 2px;
+}
+
+@media (max-width: 400px) {
+  .macro-summary {
+    gap: 6px;
+  }
+  
+  .macro-item .m-val {
+    font-size: 1em;
+  }
+  
+  .macro-item .m-label {
+    font-size: 0.65em;
+  }
 }
 
 .progress-wrapper {
